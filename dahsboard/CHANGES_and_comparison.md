@@ -18,10 +18,44 @@ Hardware: Teensy 4.1 + ADXL326 (A0) + MATLAB for acquisition. This tool replays 
 | `plot_dataset_time_fft_entropy_bearing_10nov26.py` | + fault-evidence graphics and VMD of the combined signal (third window) | 10 Nov 2026 |
 | `plot_dataset_time_fft_entropy_bearing_10nov26.py` (comments revision) | Same program, technique guide and comments added. Program logic identical (checked by comparing syntax trees) | 15 Nov 2026 |
 | `plot_dataset_time_fft_entropy_bearing_23nov26.py` | Three-window redesign of `--bearing`: window 2 = new entropy window with healthy-range gauges and entropy verdict; window 3 = VMD without the per-mode entropy table | 23 Nov 2026 |
+| `export_dashboard_data.py` + `dashboard-app/` | React web dashboard of the three windows; results exported to JSON by importing the newest analysis script. Analysis code unchanged | 23 Nov 2026 |
 
 ---
 
 ## Change log
+
+### 23 Nov 2026: React dashboard (`dashboard-app/`) + exporter (`export_dashboard_data.py`)
+
+**Why:** the user asked for a dashboard built as a React app that shows the output of the analysis code, and that keeps working when the Python code changes later.
+
+**Comparison with the matplotlib windows**
+
+| Item | matplotlib (23nov26 `--bearing`) | React dashboard |
+|---|---|---|
+| Where it runs | Desktop Python, three windows | Web browser, one page with tabs 1 / 2 / 3 + Overview |
+| Analysis | Live, in background threads | Same functions, run beforehand by `export_dashboard_data.py`, saved as JSON |
+| Window 1 | Rolling replay, updated every 0.5 s | One snapshot per 10 s window (at the end of the window) |
+| Window 2 trend | Windows played so far | Same (windows up to the selected one) |
+| Recordings | One per run | All four in one page, switchable, plus an overview table |
+| Playback | SPACE pause, R restart | Play / pause, restart, slider, x1 to x20, keys SPACE / arrows / R |
+| Analysis code | | Unchanged. The exporter imports the newest `plot_dataset_time_fft_entropy_bearing_*.py` |
+
+**Settings used for the export:** `--balls 8`, reference = `Vibration_Dataset_Healthy_2000Hz.xlsx` (fault threshold and entropy range calibrated on it, threshold 7.44 dB), VMD combined, K = 18, 10 s windows.
+
+**Test results (export of all four recordings, 30 windows each)**
+
+| Recording | Spectrum verdict FAULTY | Entropy verdict FAULTY |
+|---|---|---|
+| Healthy | 0 / 30 | 0 / 30 |
+| Healthy2 | 0 / 30 | 0 / 30 |
+| Faulty1 | 30 / 30 (FTF) | 30 / 30 |
+| Faulty2 | 30 / 30 (FTF) | 29 / 30 |
+
+Window 30 of Faulty1 and Healthy matches the screenshots of the matplotlib windows (FTF 11.5 dB, BPFI 10.7 dB; Dispersion z -9.2, Fuzzy z -4.3; VMD r 0.999 / 0.999 / 0.995 / 0.999).
+
+**Known limits:** the Healthy file is both the reference and one of the displayed recordings, so its own result is not an independent test. The exported data (about 38 MB of JSON) must be regenerated after every change to the analysis code.
+
+---
 
 ### 23 Nov 2026: three-window redesign (`--bearing`): window 2 entropy, window 3 VMD
 

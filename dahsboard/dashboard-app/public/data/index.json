@@ -1,0 +1,38 @@
+{
+ "generated": "2026-11-23 07:57",
+ "script": "plot_dataset_time_fft_entropy_bearing_23nov26.py",
+ "recordings": [
+  {
+   "slug": "Healthy",
+   "name": "Vibration_Dataset_Healthy_2000Hz",
+   "label": "Healthy",
+   "windows": 30,
+   "faulty": 0,
+   "entFaulty": 0
+  },
+  {
+   "slug": "Healthy2",
+   "name": "Vibration_Dataset_Healthy2_2000Hz",
+   "label": "Healthy",
+   "windows": 30,
+   "faulty": 0,
+   "entFaulty": 0
+  },
+  {
+   "slug": "Faulty1",
+   "name": "Vibration_Dataset_Faulty1_2000Hz",
+   "label": "Faulty",
+   "windows": 30,
+   "faulty": 30,
+   "entFaulty": 30
+  },
+  {
+   "slug": "Faulty2",
+   "name": "Vibration_Dataset_Faulty2_2000Hz",
+   "label": "Faulty",
+   "windows": 30,
+   "faulty": 30,
+   "entFaulty": 29
+  }
+ ]
+}
