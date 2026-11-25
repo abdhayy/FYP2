@@ -68,3 +68,20 @@ Open the address it prints (http://localhost:5173). `npm run build` makes a stat
 | `dashboard-app/src/Window3.jsx` | tab 3 (VMD) |
 | `dashboard-app/src/Overview.jsx` | overview table |
 | `dashboard-app/src/common.js` | colours, fault-line lists, helpers |
+
+## MaFaulDa dataset tab (public data, UFRJ)
+
+`mafaulda_analysis.py` runs the same method (envelope evidence + 7 entropies, imported from your
+analysis script) on the MaFaulDa CSV files. Run it on the computer that has the dataset:
+
+```bash
+cd dahsboard
+python mafaulda_analysis.py --root "C:\Users\User\Desktop\python fyp"
+```
+
+Quick test first: add `--limit 5` (5 files per class). It writes
+`mafaulda_results/mafaulda_features.csv`, `mafaulda_results/mafaulda_summary.json` and
+`dashboard-app/public/data/mafaulda.json` (read by the "MaFaulDa dataset" tab). Stopped runs continue
+where they stopped. `--evaluate-only` redoes only the evaluation.
+
+The raw CSV files must NOT be committed (they are ignored by `.gitignore`); only the small result files.

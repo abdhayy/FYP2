@@ -19,10 +19,25 @@ Hardware: Teensy 4.1 + ADXL326 (A0) + MATLAB for acquisition. This tool replays 
 | `plot_dataset_time_fft_entropy_bearing_10nov26.py` (comments revision) | Same program, technique guide and comments added. Program logic identical (checked by comparing syntax trees) | 15 Nov 2026 |
 | `plot_dataset_time_fft_entropy_bearing_23nov26.py` | Three-window redesign of `--bearing`: window 2 = new entropy window with healthy-range gauges and entropy verdict; window 3 = VMD without the per-mode entropy table | 23 Nov 2026 |
 | `export_dashboard_data.py` + `dashboard-app/` | React web dashboard of the three windows; results exported to JSON by importing the newest analysis script. Analysis code unchanged | 23 Nov 2026 |
+| `mafaulda_analysis.py` + MaFaulDa tab | Same method run on the public MaFaulDa dataset (cage, outer race, ball faults; healthy range from speed-matched normal files; settings tuned on one half, tested on the other) | 25 Nov 2026 |
 
 ---
 
 ## Change log
+
+### 25 Nov 2026: MaFaulDa dataset (`mafaulda_analysis.py`, dashboard tab "MaFaulDa dataset")
+
+**Why:** test the method on independent data with more fault types (the own rig has only a cage fault), as listed under "Known limits".
+
+**What the script does:** every MaFaulDa CSV (50 kHz, 5 s) -> shaft speed from the tachometer -> fault lines from the MaFaulDa bearing factors (FTF 0.375, BSF 1.871, BPFO 2.998, BPFI 5.002 x fr) -> evidence in dB (`diagnose`) for 6 accelerometers x 5 bands, and the 7 entropies (`entropy_of_window`, accelerometer decimated to 2000 Hz, entropies at 500 Hz) -> z-scores against the 10 normal files with the closest shaft speed -> best sensor/band chosen on the "tune" half -> detection reported on the "test" half.
+
+**First look (4 files near 24 Hz, one normal file, NOT a result):** the 600-900 Hz band of the own rig does not transfer: the fault-minus-normal margin of the true fault line was only 1 to 8 dB depending on channel and band (best: outer race +8.1 dB, column 6, 3-6 kHz). Column 6 shows a +24.5 dB FTF line in the NORMAL file too, so a single fault file can look faulty without a reference. Dispersion entropy changes with every fault, but the direction depends on the channel (down and up).
+
+**Status:** script and dashboard tab tested with these 4 files (pipeline only). The real result needs the full run on the laptop (all normal, underhang and overhang files).
+
+**Known limits:** column order (tachometer, underhang axial/radial/tangential, overhang axial/radial/tangential, microphone) still to be confirmed against the dataset description; the healthy range needs enough normal files near each speed (49 normal files over 12-61 Hz).
+
+---
 
 ### 23 Nov 2026: React dashboard (`dashboard-app/`) + exporter (`export_dashboard_data.py`)
 

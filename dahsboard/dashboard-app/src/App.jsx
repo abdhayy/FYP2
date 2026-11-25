@@ -3,6 +3,7 @@ import Window1 from "./Window1.jsx";
 import Window2 from "./Window2.jsx";
 import Window3 from "./Window3.jsx";
 import Overview from "./Overview.jsx";
+import MaFaulda from "./MaFaulda.jsx";
 import { clock, GREEN, RED } from "./common.js";
 
 const TABS = [
@@ -10,6 +11,7 @@ const TABS = [
   ["w2", "2 · Entropy"],
   ["w3", "3 · VMD"],
   ["overview", "Overview"],
+  ["mafaulda", "MaFaulDa dataset"],
 ];
 const DATA = "./data/";
 
@@ -218,7 +220,9 @@ export default function App() {
       </nav>
 
       <main>
-        {tab === "overview" ? (
+        {tab === "mafaulda" ? (
+          <MaFaulda />
+        ) : tab === "overview" ? (
           <Overview index={index} onOpen={(s) => { setSlug(s); setTab("w1"); }} />
         ) : !summary || !win || win.index !== winNo ? (
           <div className="card loading">Loading window {winNo}…</div>
