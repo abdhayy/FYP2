@@ -62,7 +62,7 @@ export default function Window2({ s, w }) {
           </div>
           {E.keys.map((k) => (
             <Gauge key={k} k={k} name={E.names[k]} value={d.vals[k]} z={d.z[k]} mean={E.mean[k]} std={E.std[k]}
-              half={half[k]} zc={zc} clear={clear[k]} reliable={E.reliable.includes(k)} test={E.test[k]} />
+              half={half[k]} zc={zc} clear={clear[k]} reliable={E.reliable.includes(k)} test={E.test ? E.test[k] : null} />
           ))}
         </div>
 
@@ -124,8 +124,8 @@ export default function Window2({ s, w }) {
       <p className="howto">
         HOW TO READ: entropy = how irregular the vibration is. A faulty bearing repeats impacts, so the signal becomes more
         regular and Dispersion / Fuzzy entropy DROP below the healthy range. Healthy range: {E.source}; cut-off = healthy
-        mean ± {zc} × std. "tested" = how many windows of your four recordings each entropy flagged (fixed note from the
-        10 Nov test). Entropy says THAT a fault exists, not WHICH one (windows 1 and 3).
+        mean ± {zc} × std.{E.test ? ' "tested" = how many windows of your four recordings each entropy flagged (fixed note from the 10 Nov test).' : ""}
+        {" "}Entropy says THAT a fault exists, not WHICH one (windows 1 and 3).
       </p>
     </div>
   );
@@ -161,8 +161,12 @@ function Gauge({ name, value, z, mean, std, half, zc, clear, reliable, test }) {
         {fmt(value, 3)} &nbsp; z = {signed(z, 1)} ({z < 0 ? "lower" : "higher"})
         <br />
         {tag}
-        <br />
-        tested: faulty {test[0]}/60, healthy {test[1]}/30
+        {test && (
+          <>
+            <br />
+            tested: faulty {test[0]}/60, healthy {test[1]}/30
+          </>
+        )}
       </div>
     </div>
   );

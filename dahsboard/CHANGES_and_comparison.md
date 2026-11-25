@@ -33,7 +33,9 @@ Hardware: Teensy 4.1 + ADXL326 (A0) + MATLAB for acquisition. This tool replays 
 
 **First look (4 files near 24 Hz, one normal file, NOT a result):** the 600-900 Hz band of the own rig does not transfer: the fault-minus-normal margin of the true fault line was only 1 to 8 dB depending on channel and band (best: outer race +8.1 dB, column 6, 3-6 kHz). Column 6 shows a +24.5 dB FTF line in the NORMAL file too, so a single fault file can look faulty without a reference. Dispersion entropy changes with every fault, but the direction depends on the channel (down and up).
 
-**Status:** script and dashboard tab tested with these 4 files (pipeline only). The real result needs the full run on the laptop (all normal, underhang and overhang files).
+**Status:** script and dashboard tab tested with these 4 files (pipeline only).
+
+**Update 25 Nov 2026 (after the first full run, 1120 files):** (1) shaft-speed bug fixed: some files gave 200-960 Hz because noise spikes on the tachometer counted as extra pulses. Now a Schmitt trigger (75 % / 25 % of the range) is used, and if the result is outside 8-70 Hz or more than 15 % from the speed in the file name, the file-name speed is used. Files saved with an impossible speed are processed again automatically. (2) New: windows 1-3 (live monitor, entropy, VMD) for example files (0g, closest to 25 Hz, one per fault class and bearing + 2 normal), each with its own healthy reference from its 10 speed-matched normal files, shown in the MaFaulDa tab under "Single file". The real result needs the full run on the laptop (all normal, underhang and overhang files).
 
 **Known limits:** column order (tachometer, underhang axial/radial/tangential, overhang axial/radial/tangential, microphone) still to be confirmed against the dataset description; the healthy range needs enough normal files near each speed (49 normal files over 12-61 Hz).
 

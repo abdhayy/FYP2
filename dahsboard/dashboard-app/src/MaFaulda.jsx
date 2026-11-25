@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis, Legend } from "recharts";
 import { GREEN, RED, fmt } from "./common.js";
+import Window1 from "./Window1.jsx";
+import Window2 from "./Window2.jsx";
+import Window3 from "./Window3.jsx";
 
 const CLASSES = ["normal", "cage_fault", "outer_race", "ball_fault"];
 const NAMES = { normal: "Normal", cage_fault: "Cage (FTF)", outer_race: "Outer race (BPFO)", ball_fault: "Ball (BSF)" };
@@ -158,6 +161,7 @@ export default function MaFaulda() {
           </tbody>
         </table>
       </div>
+      <FileViewer />
       <p className="howto">
         Fault lines from the MaFaulDa bearing factors (× shaft speed): FTF {d.settings.fault_factors.FTF}, BSF {d.settings.fault_factors.BSF},
         BPFO {d.settings.fault_factors.BPFO}, BPFI {d.settings.fault_factors.BPFI}. Shaft speed from the tachometer of every file.
@@ -175,6 +179,68 @@ function Bar({ v }) {
         <div style={{ width: `${Math.round(v * 100)}%`, height: "100%", background: c }} />
       </div>
       <b style={{ color: c }}>{pct(v)}</b>
+    </div>
+  );
+}
+
+// One MaFaulDa file shown in the same three windows as your own recordings (exported by mafaulda_analysis.py).
+function FileViewer() {
+  const [list, setList] = useState(null);
+  const [id, setId] = useState(null);
+  const [view, setView] = useState(null);
+  const [win, setWin] = useState("w1");
+
+  useEffect(() => {
+    fetch("./data/mafaulda_views/index.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((l) => { setList(l); if (l.length) setId(l[0].id); })
+      .catch(() => setList([]));
+  }, []);
+  useEffect(() => {
+    if (!id) return;
+    setView(null);
+    fetch(`./data/mafaulda_views/${id}.json`).then((r) => r.json()).then(setView);
+  }, [id]);
+
+  if (!list) return null;
+  if (!list.length)
+    return (
+      <div className="panel">
+        <div className="panel-title bold">Single file — live monitor, entropy and VMD</div>
+        <p className="muted small">No file views exported yet. Run <code>mafaulda_analysis.py</code> again (without <code>--no-views</code>).</p>
+      </div>
+    );
+  const mf = view && view.s.mafaulda;
+  return (
+    <div className="panel">
+      <div className="panel-title bold">Single file — the same three windows as your own recordings</div>
+      <div className="controls" style={{ justifyContent: "center", margin: "6px 0 10px" }}>
+        <label>
+          File
+          <select value={id || ""} onChange={(e) => setId(e.target.value)}>
+            {list.map((v) => (
+              <option key={v.id} value={v.id}>
+                {NAMES[v.cls]} · {v.bearing === "-" ? "" : v.bearing + " · " + v.weight + " · "}{fmt(v.fr, 1)} Hz — {v.file}
+              </option>
+            ))}
+          </select>
+        </label>
+        {[["w1", "1 · Live monitor"], ["w2", "2 · Entropy"], ["w3", "3 · VMD"]].map(([k, l]) => (
+          <button key={k} className={win === k ? "tab on" : "tab"} onClick={() => setWin(k)}>{l}</button>
+        ))}
+      </div>
+      {!view ? (
+        <div className="loading">Loading…</div>
+      ) : (
+        <>
+          <p className="muted small" style={{ textAlign: "center", margin: "0 0 8px" }}>
+            True class: <b style={{ color: COLORS[mf.cls] }}>{NAMES[mf.cls]}</b> · shaft {fmt(mf.fr, 2)} Hz · envelope on {mf.envSensor},{" "}
+            {view.s.band[0]}–{view.s.band[1]} Hz (the band of the {NAMES[mf.detector]} detector) · entropy on {mf.entSensor} · healthy reference:{" "}
+            {view.s.entropy.source}, threshold {fmt(view.s.faultDb, 1)} dB · {mf.split} half
+          </p>
+          {win === "w1" ? <Window1 s={view.s} w={view.w} /> : win === "w2" ? <Window2 s={view.s} w={view.w} /> : <Window3 s={view.s} w={view.w} />}
+        </>
+      )}
     </div>
   );
 }
